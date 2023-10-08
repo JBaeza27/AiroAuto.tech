@@ -1,5 +1,20 @@
 import requests
 import streamlit as st
+import pymongo
+
+@st.cache_resource
+def init_connection():
+    return pymongo.MongoClient(**st.secrets["mongo"])
+
+client = init_connection()
+
+def get_data():
+    db = client.mydb
+    items = db.mycollection.find()
+    return items
+
+items = get_data()
+
 from streamlit_lottie import st_lottie 
 
 st.set_page_config(page_title="", page_icon=":tada:", layout="wide")
