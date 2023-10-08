@@ -56,33 +56,13 @@ def display_data(db, make, model, year, column):
 # Create columns
 col1, col2 = st.columns(2)
 
-# First column selections
-with col1:
-    st.write("Vehicle 1:")
-    make1 = st.selectbox('Select a make:', get_dropdown_data(db, "make"))
-    model1 = st.selectbox('Select a model:', get_dropdown_data(db, "model", make1))
-    year1 = st.selectbox('Select a year:', get_dropdown_data(db, "year", make1, model1))
-    if st.button('Show Data 1'):
-        display_data(db, make1, model1, year1, col1)
 
-# Second column selections
-with col2:
-    st.write("Vehicle 2:")
-    make2 = st.selectbox('Select a make:', get_dropdown_data(db, "make"))
-    model2 = st.selectbox('Select a model:', get_dropdown_data(db, "model", make2))
-    year2 = st.selectbox('Select a year:', get_dropdown_data(db, "year", make2, model2))
-    if st.button('Show Data 2'):
-        display_data(db, make2, model2, year2, col2)
-
-python3 -m streamlit run website.py
-
-''''
 with col1:
     st.markdown('<h2 style="font-size: 30px;">Vehicle 1</h2>', unsafe_allow_html=True)
 
     Make = st.selectbox(
      'Select the make of the vehicle',
-    ('Email', 'Home phone', 'Mobile phone'))
+    ('Ford', 'Toyota', 'Nissan'))
 
     st.write('You selected:', Make)
 
@@ -261,4 +241,3 @@ with col2:
     image = Image.open('file.png')
     st.image(image)    
 
-    '''
