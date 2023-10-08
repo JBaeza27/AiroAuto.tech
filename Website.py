@@ -1,25 +1,14 @@
-import requests
 import streamlit as st
+import pandas as pd
 import pymongo
-from pymongo import MongoClient
+import requests
 from streamlit_lottie import st_lottie
 
+# Streamlit app
 st.set_page_config(page_title="", page_icon=":tada:", layout="wide")
-
-@st.cache_resource
-def init_connection():
-    return pymongo.MongoClient(**st.secrets["mongo"])
-
-client = init_connection()
-
-def get_data():
-    db = client.mydb
-    items = db.mycollection.find()
-    return client, db, items
-
-client, db, items = get_data()
-
 st.markdown('<h1 style="font-size: 50px;">Airo Auto</h1>', unsafe_allow_html=True)
+
+
 
 def load_lottieurl(url):
     r = requests.get(url)
@@ -31,77 +20,48 @@ lottie_coding = load_lottieurl("https://lottie.host/19a10b2d-6de7-4a05-9c7a-bfe7
 
 st_lottie(lottie_coding, height=300, key="cargif")
 
-st.markdown('<h2 style="font-size: 40px;"></h2>', unsafe_allow_html=True)
-st.title("Comparison of Automobile Aerodynamics")
 
-# Helper function to fetch data for dropdowns
-def get_dropdown_data(db, selection, make=None, model=None):
-    if selection == "make":
-        return db.car_records.distinct('make')
-    elif selection == "model":
-        return db.car_records.distinct('model', {'make': make})
-    else:  # "year"
-        return db.car_records.distinct('year', {'make': make, 'model': model})
+st.markdown("<h1 style='text-align: center; color: white;'>Comparison of Automobile Aerodynamics</h1>", unsafe_allow_html=True)
+
+# Load CSV data
+csv_file_path = 'table_data.csv'  # Replace with the path to your CSV file
+csv_data = pd.read_csv(csv_file_path)
 
 # Helper function to display data based on selections
-def display_data(db, make, model, year, column):
-    records = db.car_records.find({
-        'make': make,
-        'model': model,
-        'year': year
-    })
-    for record in records:
-        column.write(record)
+def display_data(data, Make, Model, Year, column):
+    records = data[(data['Make'] == Make) & (data['Model'] == Model) & (data['Year'] == Year)]
+    column.write(records)
+
+def get_cda_value(data, Make, Model, Year):
+    record = data[(data['Make'] == Make) & (data['Model'] == Model) & (data['Year'] == Year)]
+    return float(record['CdA'].values[0]) if not record.empty else None
 
 # Create columns
 col1, col2 = st.columns(2)
 
-
+# First column selections
 with col1:
-    st.markdown('<h2 style="font-size: 30px;">Vehicle 1</h2>', unsafe_allow_html=True)
+    st.write("Vehicle 1:")
+    Make1 = st.selectbox('Select a Make:', csv_data['Make'].unique())
+    Model1 = st.selectbox('Select a Model:', csv_data[csv_data['Make'] == Make1]['Model'].unique())
+    Year1 = st.selectbox('Select a Year:', csv_data[(csv_data['Make'] == Make1) & (csv_data['Model'] == Model1)]['Year'].unique())
+    if st.button('Show Data 1'):
+        display_data(csv_data, Make1, Model1, Year1, col1)
 
-    Make = st.selectbox(
-     'Select the make of the vehicle',
-    ('Ford', 'Toyota', 'Nissan'))
-
-    st.write('You selected:', Make)
-
-    Model = st.selectbox(
-        'Select the model of the vehicle',
-        ('Email', 'Home phone', 'Mobile phone'))
-
-    st.write('You selected:', Model)
-
-    Year = st.selectbox(
-        'Select the year of the vehicle',
-        ('Email', 'Home phone', 'Mobile phone'))
-
-    st.write('You selected:', Year)
-
+# Second column selections
 with col2:
-    st.markdown('<h2 style="font-size: 30px;">Vehicle 2</h2>', unsafe_allow_html=True)
-
-    Make2 = st.selectbox(
-     'Select the make of the vehicle ',
-    ('Email', 'Home phone', 'Mobile phone'))
-
-    st.write('You selected:', Make2)
-
-    Model2 = st.selectbox(
-        'Select the model of the vehicle ',
-        ('Email', 'Home phone', 'Mobile phone'))
-
-    st.write('You selected:', Model2)
-
-    Year2 = st.selectbox(
-        'Select the year of the vehicle ',
-        ('Email', 'Home phone', 'Mobile phone'))
-
-    st.write('You selected:', Year2)
+    st.write("Vehicle 2:")
+    Make2 = st.selectbox('Select a Make: ', csv_data['Make'].unique())
+    Model2= st.selectbox('Select a Model: ', csv_data[csv_data['Make'] == Make2]['Model'].unique())
+    Year2 = st.selectbox('Select a Year: ', csv_data[(csv_data['Make'] == Make2) & (csv_data['Model'] == Model2)]['Year'].unique())
+    if st.button('Show Data 2'):
+        display_data(csv_data, Make2, Model2, Year2, col2)
 
     #Everything below shows drag effiency
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+
+
 
 with col1:
     fig, ax = plt.subplots()
@@ -116,7 +76,11 @@ with col1:
         color = "Green")
     ax.add_patch(Green)
 
-    Yellow = Rectangle((8.75, 10+(7*0.1)),
+    print(csv_data['CdA']);
+
+    cda_value1 = get_cda_value(csv_data, Make1, Model1, Year1)
+    scaled_CdA1 = cda_value1 * 0.1 if cda_value1 else 0  # or provide a default value
+    Yellow = Rectangle((8.75, 10 + scaled_CdA1),
         width = 2.5,
         height = 4,
     #   angle = 0,
@@ -124,7 +88,10 @@ with col1:
         color = "yellow")
     ax.add_patch(Yellow)
 
-    Red = Rectangle((9, 12.5+(7*0.14)),
+    
+    cda_value1 = get_cda_value(csv_data, Make1, Model1, Year1)
+    scaled_CdA1 = cda_value1 * 0.14 if cda_value1 else 0  # or provide a default value
+    Red = Rectangle((9, 12.5 + scaled_CdA1),
         width = 2,
         height = 1,
     #   angle = 0,
@@ -185,7 +152,10 @@ with col2:
         color = "Green")
     ax.add_patch(Green)
 
-    Yellow = Rectangle((8.75, 10+(7*0.1)),
+   
+    cda_value2 = get_cda_value(csv_data, Make2, Model2, Year2)
+    scaled_CdA2 = cda_value2 * 0.1 if cda_value2 else 0  # or provide a default value
+    Yellow = Rectangle((8.75, 10 + scaled_CdA2),
         width = 2.5,
         height = 4,
     #   angle = 0,
@@ -193,7 +163,9 @@ with col2:
         color = "yellow")
     ax.add_patch(Yellow)
 
-    Red = Rectangle((9, 12.5+(7*0.14)),
+    cda_value2 = get_cda_value(csv_data, Make2, Model2, Year2)
+    scaled_CdA2 = cda_value2 * 0.14 if cda_value2 else 0  # or provide a default value
+    Red = Rectangle((9, 12.5 + scaled_CdA2),
         width = 2,
         height = 1,
     #   angle = 0,
