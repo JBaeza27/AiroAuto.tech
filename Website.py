@@ -1,6 +1,8 @@
 import requests
 import streamlit as st
 import pymongo
+from pymongo import MongoClient
+from streamlit_lottie import st_lottie
 
 st.set_page_config(page_title="", page_icon=":tada:", layout="wide")
 
@@ -13,11 +15,9 @@ client = init_connection()
 def get_data():
     db = client.mydb
     items = db.mycollection.find()
-    return items
+    return client, db, items
 
-items = get_data()
-
-from streamlit_lottie import st_lottie 
+client, db, items = get_data()
 
 st.markdown('<h1 style="font-size: 50px;">Airo Auto</h1>', unsafe_allow_html=True)
 
@@ -27,7 +27,6 @@ def load_lottieurl(url):
         return None
     return r.json()
 
-
 lottie_coding = load_lottieurl("https://lottie.host/19a10b2d-6de7-4a05-9c7a-bfe7ccfbad3e/v3V4DjqTTE.json")
 
 st_lottie(lottie_coding, height=300, key="cargif")
@@ -35,8 +34,49 @@ st_lottie(lottie_coding, height=300, key="cargif")
 st.markdown('<h2 style="font-size: 40px;"></h2>', unsafe_allow_html=True)
 st.title("Comparison of Automobile Aerodynamics")
 
+# Helper function to fetch data for dropdowns
+def get_dropdown_data(db, selection, make=None, model=None):
+    if selection == "make":
+        return db.car_records.distinct('make')
+    elif selection == "model":
+        return db.car_records.distinct('model', {'make': make})
+    else:  # "year"
+        return db.car_records.distinct('year', {'make': make, 'model': model})
+
+# Helper function to display data based on selections
+def display_data(db, make, model, year, column):
+    records = db.car_records.find({
+        'make': make,
+        'model': model,
+        'year': year
+    })
+    for record in records:
+        column.write(record)
+
+# Create columns
 col1, col2 = st.columns(2)
 
+# First column selections
+with col1:
+    st.write("Vehicle 1:")
+    make1 = st.selectbox('Select a make:', get_dropdown_data(db, "make"))
+    model1 = st.selectbox('Select a model:', get_dropdown_data(db, "model", make1))
+    year1 = st.selectbox('Select a year:', get_dropdown_data(db, "year", make1, model1))
+    if st.button('Show Data 1'):
+        display_data(db, make1, model1, year1, col1)
+
+# Second column selections
+with col2:
+    st.write("Vehicle 2:")
+    make2 = st.selectbox('Select a make:', get_dropdown_data(db, "make"))
+    model2 = st.selectbox('Select a model:', get_dropdown_data(db, "model", make2))
+    year2 = st.selectbox('Select a year:', get_dropdown_data(db, "year", make2, model2))
+    if st.button('Show Data 2'):
+        display_data(db, make2, model2, year2, col2)
+
+python3 -m streamlit run website.py
+
+''''
 with col1:
     st.markdown('<h2 style="font-size: 30px;">Vehicle 1</h2>', unsafe_allow_html=True)
 
@@ -220,3 +260,5 @@ with col2:
 
     image = Image.open('file.png')
     st.image(image)    
+
+    '''
