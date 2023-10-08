@@ -2,6 +2,8 @@ import requests
 import streamlit as st
 import pymongo
 
+st.set_page_config(page_title="", page_icon=":tada:", layout="wide")
+
 @st.cache_resource
 def init_connection():
     return pymongo.MongoClient(**st.secrets["mongo"])
@@ -17,7 +19,6 @@ items = get_data()
 
 from streamlit_lottie import st_lottie 
 
-st.set_page_config(page_title="", page_icon=":tada:", layout="wide")
 st.markdown('<h1 style="font-size: 50px;">Airo Auto</h1>', unsafe_allow_html=True)
 
 def load_lottieurl(url):
