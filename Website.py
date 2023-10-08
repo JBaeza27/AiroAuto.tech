@@ -1,12 +1,23 @@
-#Streamlit
+import requests
 import streamlit as st
+from streamlit_lottie import st_lottie 
+
+st.set_page_config(page_title="", page_icon=":tada:", layout="wide")
+st.markdown('<h1 style="font-size: 50px;">Airo Auto</h1>', unsafe_allow_html=True)
+
+def load_lottieurl(url):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
 
 
-st.set_page_config(page_title="Airo Auto", page_icon=":tada:", layout="wide")
+lottie_coding = load_lottieurl("https://lottie.host/19a10b2d-6de7-4a05-9c7a-bfe7ccfbad3e/v3V4DjqTTE.json")
 
-st.markdown('<h2 style="font-size: 40px;">Airo Auto</h2>', unsafe_allow_html=True)
+st_lottie(lottie_coding, height=300, key="cargif")
+
+st.markdown('<h2 style="font-size: 40px;"></h2>', unsafe_allow_html=True)
 st.title("Comparison of Automobile Aerodynamics")
-st.write("lol")
 
 col1, col2 = st.columns(2)
 
