@@ -74,7 +74,7 @@ with col2:
     if st.button('Show Data 2'):
         display_data(db, make2, model2, year2, col2)
 
-python3 -m streamlit run website.py
+
 
 ''''
 with col1:
