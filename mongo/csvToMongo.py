@@ -32,7 +32,7 @@ import csv
 import pymongo
 
 # MongoDB connection settings
-mongo_client = pymongo.MongoClient("mongodb+srv://josephbaeza:test123@cluster0.nud7d8s.mongodb.net/?retryWrites=true&w=majority")  # Replace with your MongoDB connection string
+mongo_client = pymongo.MongoClient("mongodb+srv://josephbaeza:password@cluster0.nud7d8s.mongodb.net/?retryWrites=true&w=majority")  # Replace with your MongoDB connection string
 db = mongo_client['cars_db']  # Replace 'my_database' with your database name
 collection = db['cars_records']  # Replace 'my_collection' with your collection name
 
@@ -49,7 +49,7 @@ with open(csv_file_path, 'r') as csv_file:
 print('Data from CSV file has been imported into MongoDB.')
 
 from pymongo import MongoClient
-client = MongoClient ("mongodb+srv://josephbaeza:test123@cluster0.a08odj5.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient ("mongodb+srv://josephbaeza:password@cluster0.a08odj5.mongodb.net/?retryWrites=true&w=majority")
 db = client.get_database('cars_db')
 records = db.car_records
 
@@ -61,7 +61,7 @@ import csv
 from pymongo import MongoClient
 
 # MongoDB connection settings
-client = MongoClient("mongodb+srv://josephbaeza:test123@cluster0.a08odj5.mongodb.net/?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://josephbaeza:password@cluster0.a08odj5.mongodb.net/?retryWrites=true&w=majority")
 db = client.get_database('cars_db')
 records = db.car_records
 
